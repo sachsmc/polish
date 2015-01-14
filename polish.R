@@ -1,25 +1,30 @@
 #' Convert a function into a simple shiny appliction
 #' 
 #' @param fn Function taking named arguments with defaults that will be converted
-#' @param types Vector of argument types going into the function. Possible values are 'numeric', 'text', 'logical'
 #' @param name Name of directory to write ui.R and server.R to
 #' @param plot Logical, if true results in a plot output instead of verbatim text output
 
 
-polish <- function(fn, types = rep("numeric", length(as.list(fn)) - 1), 
+polish <- function(fn,
                    name = paste("polished", deparse(substitute(fn)), sep = "-"), 
                    plot = FALSE){
   
   lookup <- c("numericInput('", "textInput('", "checkboxInput('")
-  names(lookup) <- c("numeric", "text", "logical")
+  names(lookup) <- c("numeric", "character", "logical")
   
   fnls <- as.list(fn)[-length(as.list(fn))]
+  
+  types <- sapply(fnls, class)
+  if("name" %in% types) stop(paste("Argument", paste(names(types)[types == "name"], collapse = ", "), "requires default value"))
+  
   inputnames <- names(fnls)
   inputdefs <- as.character(fnls)
   
-  inputdefs[types == "text" & inputdefs != ""] <- paste0("'", inputdefs[types == "text" & inputdefs != ""], "'")
+  inputdefs[types == "character"] <- paste0("'", inputdefs[types == "character"], "'")
   
   defvals <- ifelse(inputdefs == "", "", paste0(", value = ", inputdefs))
+  
+
   inputtypes <- lookup[types]
   
   inputstatements <- paste(paste0(inputtypes, inputnames, "'", 
@@ -31,7 +36,7 @@ polish <- function(fn, types = rep("numeric", length(as.list(fn)) - 1),
   
   # server
   
-  arglist <- paste(paste(inputnames, ifelse(inputdefs != "", paste0(" = ", inputdefs), "")), collapse = ", ")
+  arglist <- paste(paste(inputnames, paste0(" = ", inputdefs)), collapse = ", ")
   
   fnbody <- paste(as.list(fn)[length(as.list(fn))])
   fndef <- paste(deparse(substitute(fn)), " <- function(", arglist, ")", fnbody)

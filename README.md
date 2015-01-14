@@ -2,7 +2,15 @@
 
 This function takes a function, parses its arguments, and creates a simple [Shiny](http://shiny.rstudio.com/) application using the function arguments and defaults as inputs. Currently it supports numeric, text, and logical arguments. All arguments must be named and have defaults. On the output side, it creates text output from the function, or a plot by using `plot = TRUE`. This is in early development, it may not work in all cases, and is expected to change in the future. 
 
-## Example
+## Installation
+
+This isn't an `R` package yet. Source the code like so:
+
+```r
+devtools::source_url("https://raw.githubusercontent.com/sachsmc/polish/master/polish.R")
+```
+
+## Examples
 
 ```r
 sizfunc<-function(RR = 0.711, B = 1000, x = 40, conprob = 0.94, title = "Test", plot = FALSE){
@@ -17,7 +25,18 @@ sizfunc<-function(RR = 0.711, B = 1000, x = 40, conprob = 0.94, title = "Test", 
   return(round(colMeans(rowout), 2))
 }
 
-polish(sizfunc, types = c(rep("numeric", 4), "text", "logical"))
+polish(sizfunc)
+```
+
+
+```r
+fnplot <- function(title = "Hello"){
+
+  hist(rnorm(100), main = title)
+
+}
+
+polish(fnplot, plot = TRUE)
 ```
 
 ## License
