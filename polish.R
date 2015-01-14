@@ -15,7 +15,9 @@ polish <- function(fn,
   fnls <- as.list(fn)[-length(as.list(fn))]
   
   types <- sapply(fnls, class)
-  if("name" %in% types) stop(paste("Argument", paste(names(types)[types == "name"], collapse = ", "), "requires default value"))
+  argcheck <- sapply(types, function(x) x %in% names(lookup))
+  
+  if(!all(argcheck)) stop(paste("Argument", paste(names(types)[types == "name"], collapse = ", "), "default not character, numeric, or logical."))
   
   inputnames <- names(fnls)
   inputdefs <- as.character(fnls)
